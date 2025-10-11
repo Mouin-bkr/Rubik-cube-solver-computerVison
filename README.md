@@ -16,12 +16,14 @@ A React + TypeScript + Flask application to scan a physical Rubik's Cube with a 
 ### 1. Install Dependencies
 
 #### Client (Frontend)
+
 ```bash
 cd Client
 npm install
 ```
 
 #### Server (Backend)
+
 ```bash
 cd Server
 npm install
@@ -29,6 +31,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Verify Python Setup
+
 ```bash
 cd Server
 python3 test_vision.py
@@ -39,15 +42,18 @@ This will verify that OpenCV, NumPy, scikit-learn, Pillow, and Flask are install
 ### 3. Start Development Servers
 
 From the **Server** directory:
+
 ```bash
 npm run dev
 ```
 
 This starts both servers concurrently:
+
 - Flask server (computer vision) on port 5000
 - Express server (cube logic) on port 3001
 
 From the **Client** directory (in a new terminal):
+
 ```bash
 npm run dev
 ```
@@ -93,57 +99,6 @@ Server/
 └── test_vision.py               # Dependency verification
 ```
 
-## Scanning Issues Fixed
-
-The original implementation had several critical issues preventing reliable cube scanning:
-
-### Problems Identified
-1. **Missing Flask Server**: The client was calling `/api/process-frame` but no server was handling this endpoint
-2. **Weak Detection**: Hard-coded parameters, poor clustering approach, unreliable under different lighting
-3. **Color Classification**: Simplistic HSV thresholds that failed with shadows, glare, or ambient lighting
-
-### Solutions Implemented
-1. **New Flask Server**: Properly integrated Python computer vision with the frontend
-2. **Improved Algorithm**:
-   - Detects the entire cube face as one contour (not individual stickers)
-   - Perspective correction with proper point ordering
-   - Adaptive color sampling from corrected perspective
-3. **Better Color Detection**:
-   - Improved HSV thresholds with lighting tolerance
-   - Forces center sticker to match expected face color
-   - Stricter validation (max 2 unknown colors)
-
-See [SCANNING_FIXES.md](./SCANNING_FIXES.md) for detailed technical information.
-
-## Usage Tips
-
-### For Better Scanning Results
-
-1. **Lighting**: Use bright, even lighting without harsh shadows or glare
-2. **Distance**: Hold the cube 20-30cm from the camera
-3. **Alignment**: Keep the cube face parallel to the camera
-4. **Stability**: Hold steady - motion blur affects detection
-5. **Background**: Use a plain, non-reflective background
-6. **Cube Condition**: Clean cubes scan better than scratched/worn ones
-
-### Debug Images
-
-While scanning, three debug images help troubleshoot:
-- **Edges**: Edge detection result
-- **Overlay**: Detected contour on the original image (should be green square around face)
-- **Warped**: Perspective-corrected face (should show square face with visible colors)
-
-### Common Errors
-
-- **cube_contour_not_found**: Cube not visible, too small, or poor edge contrast
-  - Fix: Move closer, clean background, better lighting
-
-- **color_validation_failed**: Colors detected but don't match expectations
-  - Fix: Better lighting, reduce glare, check cube orientation
-
-- **perspective_failed**: Can't compute perspective transform
-  - Fix: Hold cube more parallel to camera, reduce rotation
-
 ## Technology Stack
 
 - **Frontend**: React 18, TypeScript, Vite, Three.js, React Three Fiber, Zustand
@@ -154,6 +109,7 @@ While scanning, three debug images help troubleshoot:
 ## Development
 
 ### Run Servers Individually
+
 ```bash
 # Flask only
 cd Server
@@ -165,6 +121,7 @@ npm run dev:express
 ```
 
 ### Build for Production
+
 ```bash
 cd Client
 npm run build
