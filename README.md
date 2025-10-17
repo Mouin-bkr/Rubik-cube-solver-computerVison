@@ -33,7 +33,7 @@ pip install -r requirements.txt
 ### 2. Verify Python Setup
 
 ```bash
-cd Server
+cd Server/src
 python3 test_vision.py
 ```
 
