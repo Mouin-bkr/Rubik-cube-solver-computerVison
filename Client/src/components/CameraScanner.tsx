@@ -41,9 +41,11 @@ const isLocalhost =
   (window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1");
 
-const API_URL = isLocalhost
-  ? "http://localhost:5000/api/process-frame"
-  : "/api/process-frame"; // assume HTTPS + reverse proxy in production
+const FLASK_BASE =
+  (import.meta as any).env?.VITE_FLASK_URL ||
+  (isLocalhost ? "http://localhost:5000" : "");
+
+const API_URL = `${FLASK_BASE}/api/process-frame`;
 
 export function CameraScanner({
   onScanComplete,

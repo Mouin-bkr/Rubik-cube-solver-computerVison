@@ -7,15 +7,24 @@ import { solvingRoutes } from "./routes/solvingRoutes";
 
 const app = express();
 const server = createServer(app);
+// Allowed origins: from env (comma-separated) or default to localhost in dev
+const corsEnv = process.env.CORS_ORIGIN || "http://localhost:5173";
+const allowedOrigins = corsEnv.split(",").map((s) => s.trim()).filter(Boolean);
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Vite default port
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
 });
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+  })
+);
 app.use(express.json());
 
 // Routes
@@ -41,4 +50,9 @@ const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📡 Socket.io server ready for connections`);
+});
+
+// Optional health check
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", service: "cube-logic" });
 });

@@ -12,6 +12,8 @@
   "dependencies": {
     "@react-three/drei": "^10.7.6",
     "@react-three/fiber": "^9.3.0",
+    "latest": "^0.2.0",
+    "n": "^10.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-webcam": "^7.2.0",

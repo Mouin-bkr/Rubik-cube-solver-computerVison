@@ -9,6 +9,11 @@ interface ControlsProps {
 }
 
 export function Controls({ onStartScan }: ControlsProps) {
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+  const EXPRESS_URL =
+    import.meta.env.VITE_EXPRESS_URL || (isLocalhost ? "http://localhost:3001" : "");
   const {
     resetCube,
     scrambleCube,
@@ -55,7 +60,7 @@ export function Controls({ onStartScan }: ControlsProps) {
     setIsSolving(true);
     try {
       const cubeState = getCubeStateString();
-      const response = await fetch("http://localhost:3001/api/solving/start", {
+      const response = await fetch(`${EXPRESS_URL}/api/solving/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cube: cubeState }),

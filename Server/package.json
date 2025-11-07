@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "concurrently \"nodemon src/index.ts\" \"python3 src/flask_server.py\"",
+    "dev": "concurrently \"nodemon src/index.ts\" \". .venv/bin/activate && python src/flask_server.py\"",
     "dev:express": "nodemon src/index.ts",
-    "dev:flask": "python3 src/flask_server.py",
+    "dev:flask": ". .venv/bin/activate && python src/flask_server.py",
+    "install:python": ". .venv/bin/activate && pip install -r requirements.txt",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

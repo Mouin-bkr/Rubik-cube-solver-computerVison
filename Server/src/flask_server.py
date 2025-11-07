@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
 import cv2
 import numpy as np
 import base64
@@ -8,7 +9,9 @@ from PIL import Image
 import traceback
 
 app = Flask(__name__)
-CORS(app)
+# Allow CORS from configured origin(s) or default to localhost for dev
+cors_origin = os.environ.get("CORS_ORIGIN", "http://localhost:5173")
+CORS(app, resources={r"/*": {"origins": cors_origin}})
 
 class ImprovedCubeDetector:
     def __init__(self):
@@ -251,4 +254,6 @@ def health():
     return jsonify({'status': 'ok', 'service': 'cube-vision-api'})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(host='0.0.0.0', port=port, debug=debug)

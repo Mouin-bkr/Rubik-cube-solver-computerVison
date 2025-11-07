@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { execFile } from "child_process";
 import path from "path";
+import fs from "fs";
 
 const router = Router();
 
@@ -16,9 +17,16 @@ router.post("/start", (req, res) => {
       });
     }
 
-    // Call the Python script to solve the cube using kociemba
-    const scriptPath = path.join(__dirname, "../solve_cube.py");
-    execFile("python", [scriptPath, cube], (error, stdout, stderr) => {
+  // Call the Python script to solve the cube using kociemba
+  // Resolve to the source file to work in both dev (ts-node) and prod (dist build)
+  const scriptPath = path.resolve(__dirname, "..", "..", "src", "solve_cube.py");
+
+  // Prefer a configured Python interpreter, then venv python, else fallback
+  const serverRoot = path.resolve(__dirname, "..", ".."); // points to Server/
+  const venvPython = path.join(serverRoot, ".venv", "bin", "python");
+  const pythonExec = process.env.PYTHON_BIN || (fs.existsSync(venvPython) ? venvPython : (process.platform === 'win32' ? 'python' : 'python3'));
+
+  execFile(pythonExec, [scriptPath, cube], (error, stdout, stderr) => {
       if (error) {
         return res.status(500).json({
           success: false,

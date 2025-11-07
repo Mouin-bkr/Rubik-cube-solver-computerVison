@@ -4,3 +4,4 @@ Pillow==10.4.0
 numpy==2.1.1
 opencv-python==4.10.0.84
 scikit-learn==1.5.2
+kociemba==1.2.1
