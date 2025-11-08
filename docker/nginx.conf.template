@@ -1,0 +1,48 @@
+events {}
+
+http {
+  upstream flask_up {
+    server 127.0.0.1:5000;
+  }
+  upstream node_up {
+    server 127.0.0.1:3001;
+  }
+
+  server {
+    listen ${PORT};
+
+    # Increase client body size for image uploads
+    client_max_body_size 20M;
+
+    location /api/process-frame {
+      proxy_pass http://flask_up;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/solving {
+      proxy_pass http://node_up;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /socket.io/ {
+      proxy_pass http://node_up;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_set_header Host $host;
+    }
+
+    location / {
+      proxy_pass http://node_up;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+  }
+}
