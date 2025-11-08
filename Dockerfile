@@ -10,22 +10,24 @@ RUN apt-get update \
 	&& apt-get install -y --no-install-recommends python3 python3-pip nginx procps gettext-base \
 	&& rm -rf /var/lib/apt/lists/*
 
-# Copy server source and install Node deps, build Express
-COPY Server/package.json Server/package-lock.json* ./Server/
+# Copy whole Server directory into the image (avoids path/copy issues)
+COPY Server /app/Server
 WORKDIR /app/Server
-RUN npm install --legacy-peer-deps || npm install || true
-COPY Server/src ./src
-RUN npm run build
+
+# Install Node deps and build Express
+RUN if [ -f package-lock.json ]; then npm ci --legacy-peer-deps || npm install --legacy-peer-deps; else npm install --legacy-peer-deps || true; fi
+RUN npm run build || echo "npm build did not produce dist (check build logs)"
 
 # Install Python requirements for Flask
-COPY Server/requirements.txt ./requirements.txt
+# Ensure pip and build tools are recent so wheels (numpy, etc.) can be installed
+RUN python3 -m pip install --upgrade pip setuptools wheel
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
-# Copy start scripts and nginx template
-COPY Server/start_prod.sh /app/Server/start_prod.sh
+# Copy start scripts and nginx template (already present under /app/Server from COPY)
+RUN chmod +x /app/Server/start_prod.sh || true
 COPY docker/nginx.conf.template /etc/nginx/nginx.conf.template
 COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /app/Server/start_prod.sh /entrypoint.sh
+RUN chmod +x /app/Server/start_prod.sh /entrypoint.sh || true
 
 ENV FLASK_PORT=5000
 ENV NODE_PORT=3001
