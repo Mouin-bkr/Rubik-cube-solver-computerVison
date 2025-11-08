@@ -7,7 +7,9 @@ WORKDIR /app
 
 # Install python, pip and nginx
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends python3 python3-pip nginx procps gettext-base \
+	&& apt-get install -y --no-install-recommends \
+		python3 python3-pip python3-dev build-essential gcc g++ libffi-dev pkg-config \
+		nginx procps gettext-base \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Copy whole Server directory into the image (avoids path/copy issues)
